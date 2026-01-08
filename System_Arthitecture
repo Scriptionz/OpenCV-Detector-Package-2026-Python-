@@ -1,0 +1,28 @@
+# ----------------- SYSTEM ARCHITECTURE (HOW IT WORKS) ----------------- #
+# 1. DEPENDENCY MANAGEMENT:
+#    The script automatically checks for OpenCV and NumPy. If missing, it uses 
+#    subprocess to install them and restarts itself to ensure a clean environment.
+#
+# 2. CONFIGURATION LAYER:
+#    All system parameters (UI labels, feature toggles, camera settings) are 
+#    stored in modular dictionaries (LANGUAGE_SETTINGS, SETTINGS, CAM_CONFIG).
+#    This allows high-level customization without altering the core logic.
+#
+# 3. VISION PIPELINE:
+#    A. Image Acquisition: Captures real-time frames from the specified camera index.
+#    B. Pre-processing: Applies high-intensity Gaussian Blur on HSV space 
+#       to eliminate digital flickering and sensor noise.
+#    C. Color Masking: Uses inRange filtering to isolate specific color frequencies.
+#    D. Morphology (Closing): Fills small gaps within shapes and removes ghost pixels.
+#
+# 4. OBJECT RECOGNITION:
+#    A. Contour Analysis: Extracts shape outlines and filters by modular area settings.
+#    B. Polygon Approximation: Uses Douglas-Peucker (approxPolyDP) for vertex count.
+#    C. Geometric Labeling: Classifies shapes based on corner counts (3, 4, 5, 6, 8+).
+#
+# 5. USER INTERFACE:
+#    Real-time rendering of detection boxes, labels, and the center-point 
+#    color analyzer on the video stream.
+#
+# > and a extra note, if you run application and can't close it, that means you didn't check settings. "q" key to stop it and you can change it.
+# ----------------------------------------------------------------------- #
