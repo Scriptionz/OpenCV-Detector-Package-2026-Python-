@@ -2,6 +2,8 @@
 # GitHub: @Scriptionz [https://github.com/Scriptionz] 
 # LinkedIn: @Emir Karadağ [https://www.linkedin.com/in/emir-karadağ-617a013a2/]
 
+# # !! Licensed under the MIT License. !!
+
 # --------------- VERSION HISTORY ----------------- #
 
 # {LATEST} v1.3.2 - Final Modular Precision & Noise Filter - 8 January 2026
