@@ -2,10 +2,11 @@
 # GitHub: @Scriptionz [https://github.com/Scriptionz] 
 # LinkedIn: @Emir Karadağ [https://www.linkedin.com/in/emir-karadağ-617a013a2/]
 
-# # !! Licensed under the MIT License. !!
+# !! Licensed under the MIT License. Please check the license before using the system. !!
 
 # --------------- VERSION HISTORY ----------------- #
 
+# {LATEST} v1.3.3 - Shape Detection Plus & New Features & Optimizations - 20 January 2026
 # {LATEST} v1.3.2 - Final Modular Precision & Noise Filter - 8 January 2026
 # {OLD} v1.3.1 - Fixed Shape Detection Logic - 8 January 2026
 # {OLD} v1.3.0 - Modular Output Full - 8 January 2026
@@ -13,92 +14,76 @@
 # {OLD} v1.1.0 - Modular Output Beta - 13 November 2025
 # {OLDEST} v1.0.0 - Color Detection - 2 November 2025
 
-# Import Needed Libraries
 import os
 import sys
 import subprocess
+import time
 
-def install_dependencies(): # Checks libraries if its loaded or not
-    """Checks and installs required libraries if they are missing."""
+def install_dependencies():
+    """Checks for required libraries and installs them if missing."""
     required = {'opencv-python', 'numpy'}
     try:
         import cv2
         import numpy as np
     except ImportError:
-        print("SYSTEM: Missing libraries detected. Installing dependencies...")
+        print("SYSTEM: Missing libraries detected. Installing...")
         try:
             subprocess.check_call([sys.executable, "-m", "pip", "install", *required])
-            print("SYSTEM: Installation successful. Restarting script...")
             os.execl(sys.executable, sys.executable, *sys.argv)
         except Exception as e:
-            print(f"FATAL ERROR 003: Could not install dependencies. {e}")
+            print(f"FATAL ERROR 003: {e}")
             sys.exit()
 
-# Run Dependency Check
 install_dependencies()
 
 import cv2
 import numpy as np
 
+
 # --------------- CONFIGURATION & LOCALIZATION ----------------- #
 
-# Output & Language Settings (Change your strings here)
+CURRENT_VERSION = "v1.3.3"
 LANGUAGE_SETTINGS = {
-    "startup_msg": "UAV X DEVELOPMENT - System Loading...",
-    "err_no_cam": "ERROR 001: Camera not detected. Please check connection.",
-    "err_frame_lost": "ERROR 032: Failed to capture frame during operation.",
-    "ui_window_name": "UAV Vision System - v1.3.2",
+    "startup_msg": f"UAV X DEVELOPMENT - {CURRENT_VERSION} Loading...",
+    "err_no_cam": "ERROR 001: Camera not detected.",
+    "err_frame_lost": "ERROR 032: Frame lost.",
+    "ui_window_name": f"UAV Vision System - {CURRENT_VERSION}",
     "color_names": {
-        "red": "RED",
-        "orange": "ORANGE",
-        "yellow": "YELLOW",
-        "green": "GREEN",
-        "blue": "BLUE",
-        "purple": "PURPLE"
+        "red": "RED", "orange": "ORANGE", "yellow": "YELLOW",
+        "green": "GREEN", "blue": "BLUE", "purple": "PURPLE"
     },
     "shape_labels": {
-        "tri": "TRIANGLE",
-        "rect": "RECTANGLE",
-        "pent": "PENTAGON",
-        "hex": "HEXAGON",
-        "poly": "POLYGON",
-        "circle": "CIRCLE"
+        "tri": "TRIANGLE", "rect": "RECTANGLE", "pent": "PENTAGON",
+        "hex": "HEXAGON", "poly": "POLYGON", "circle": "CIRCLE"
     }
 }
 
-# Feature Toggles (True/False)
 SETTINGS = {
-    "target_humanoids_WIP": False,
-    "dot_color_reader": True,       # Focuses on the center point color
+    "dot_color_reader": True,       # Analyzes the color of the center pixel
     "shape_detection": False,        # Detects geometric patterns
-    "cam_color_reader_WIP": False,
-    "target_identifier_WIP": True,
-    "voice_feedback_WIP": False
+    "telemetry_overlay": True,      # Displays FPS and Latency
+    "auto_brightness": True,        # Histogram Equalization for light stability
+    "target_identifier": True       # Visual 'LOCKED' box for targets
 }
 
-# Fine-Tuning Detection Parameters (MODULAR TUNING)
 DETECTION_PARAMS = {
-    "min_area": 4500,               # Minimum object size (Increased to fix neck/ghost noise)
-    "blur_size": (15, 15),          # High blur to fix pixel flickering
-    "epsilon_coeff": 0.04,          # Tolerance (Higher = less sensitive to pixel jitters)
-    "line_thickness": 2,            # Thickness of contours and circles
+    "min_area": 4500,               # Minimum area to filter out noise
+    "blur_size": (15, 15),          # Gaussian blur to prevent flickering
+    "epsilon_coeff": 0.04,          # Polygon approximation tolerance
+    "line_thickness": 2,            # UI drawing thickness
     "hsv_lower": np.array([0, 70, 50]),
     "hsv_upper": np.array([180, 255, 255]),
+    "circularity_threshold": 0.75   # Threshold for mathematical circle verification
 }
 
-# Camera Settings
 CAM_CONFIG = {
-    "width": 1280,
-    "height": 720,
-    "device_index": 0,              # Which camera to run? [0 means 1st camera]
-    "exit_key": "q"                 # Key to close the application
+    "width": 1280, "height": 720,
+    "device_index": 0, "exit_key": "q"
 }
 
 # --------------- CORE SYSTEM ----------------- #
 
 print(LANGUAGE_SETTINGS["startup_msg"])
-
-# Initialize Camera Stream
 cap = cv2.VideoCapture(CAM_CONFIG["device_index"])
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_CONFIG["width"])
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_CONFIG["height"])
@@ -107,91 +92,94 @@ if not cap.isOpened():
     print(LANGUAGE_SETTINGS["err_no_cam"])
     sys.exit()
 
+prev_time = time.time() 
+
 while True:
     ret, frame = cap.read()
-    if not ret:
-        print(LANGUAGE_SETTINGS["err_frame_lost"])
-        break
+    if not ret: break
 
-    # --- Feature 1: Center Dot Color Reader ---
+    # --- [STEP 1: LIGHTING STABILIZATION] --- 
+    # Balances exposure for outdoor flight stability
+    if SETTINGS["auto_brightness"]:
+        img_yuv = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV)
+        img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
+        frame = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
+
+    # --- [STEP 2: COLOR ANALYSIS] ---
+    # Identifies the color at the center crosshair using HSV space
     if SETTINGS["dot_color_reader"]:
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         height, width, _ = frame.shape
         cx, cy = width // 2, height // 2
-
-        # Analyze central pixel
-        b, g, r = map(int, frame[cy, cx])
         hue = hsv_frame[cy, cx][0]
+        b, g, r = map(int, frame[cy, cx])
 
-        # Logic for color classification
-        colors = LANGUAGE_SETTINGS["color_names"]
-        if hue < 5 or hue > 170: color_str = colors["red"]
-        elif hue < 22: color_str = colors["orange"]
-        elif hue < 33: color_str = colors["yellow"]
-        elif hue < 78: color_str = colors["green"]
-        elif hue < 131: color_str = colors["blue"]
-        else: color_str = colors["purple"]
+        c = LANGUAGE_SETTINGS["color_names"]
+        if hue < 5 or hue > 170: color_str = c["red"]
+        elif hue < 22: color_str = c["orange"]
+        elif hue < 33: color_str = c["yellow"]
+        elif hue < 78: color_str = c["green"]
+        elif hue < 131: color_str = c["blue"]
+        else: color_str = c["purple"]
 
-        # UI Overlay: Status Bar and Aiming Circle
+        # Render UI crosshair and color status
         cv2.rectangle(frame, (cx - 150, 600), (cx + 150, 680), (255, 255, 255), -1)
         cv2.putText(frame, color_str, (cx - 100, 655), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (b, g, r), 3)
-        cv2.circle(frame, (cx, cy), 5, (0, 0, 255), DETECTION_PARAMS["line_thickness"])
+        cv2.circle(frame, (cx, cy), 5, (0, 0, 255), 2)
 
-    # --- Feature 2: Geometric Shape Detection ---
+    # --- [STEP 3: SHAPE DETECTION] ---
+    # Masks image, removes paratistics, and classifies geometric forms
     if SETTINGS["shape_detection"]:
-        # Pre-processing (Anti-Ghosting logic)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) 
-        
-        # Apply Modular Blur to handle low-quality camera flicker
         blurred_hsv = cv2.GaussianBlur(hsv, DETECTION_PARAMS["blur_size"], 0) 
-        
-        # Color Masking
         mask = cv2.inRange(blurred_hsv, DETECTION_PARAMS["hsv_lower"], DETECTION_PARAMS["hsv_upper"])
 
-        # Morphological operations (Filling gaps and removing small pixel dots)
+        # Morphological Operations: Closes small holes and removes noise
         kernel = np.ones((7,7), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
-        # Finding stable contours
+        # Detect stable contours
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            
-            # Area Filter: High threshold to ignore noisy neck/shoulder pixels
             if area > DETECTION_PARAMS["min_area"]:
-
                 peri = cv2.arcLength(cnt, True)
-                # Douglas-Peucker Polygon Approximation
                 approx = cv2.approxPolyDP(cnt, DETECTION_PARAMS["epsilon_coeff"] * peri, True)
                 
-                corners = len(approx)
-                x, y, w, h = cv2.boundingRect(approx)
+                # Mathematical Circularity Formula (4*PI*Area / Peri^2)
+                # Measures 'roundness' regardless of corner counts
+                circularity = (4 * np.pi * area) / (peri**2)
                 
-                # Aspect Ratio Filter: Reject thin/weird shaped ghosts
-                aspect_ratio = float(w)/h
-                if 0.2 < aspect_ratio < 5.0:
-                    labels = LANGUAGE_SETTINGS["shape_labels"]
-                    
-                    # Logic for Shape Classification
-                    if corners == 3: label = labels["tri"]
-                    elif corners == 4: label = labels["rect"]
-                    elif 5 <= corners <= 6: label = labels["poly"]
-                    elif corners > 7: label = labels["circle"]
-                    else: continue
+                label = "UNKNOWN"
+                if circularity > DETECTION_PARAMS["circularity_threshold"]:
+                    label = LANGUAGE_SETTINGS["shape_labels"]["circle"]
+                elif len(approx) == 3: label = LANGUAGE_SETTINGS["shape_labels"]["tri"]
+                elif len(approx) == 4: label = LANGUAGE_SETTINGS["shape_labels"]["rect"]
+                elif 5 <= len(approx) <= 6: label = LANGUAGE_SETTINGS["shape_labels"]["poly"]
+                else: continue
 
-                    # Visual Rendering
-                    cv2.drawContours(frame, [approx], 0, (0, 255, 0), DETECTION_PARAMS["line_thickness"])
-                    cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                # Target Tracking Visuals (Bounding Box)
+                x, y, w, h = cv2.boundingRect(approx)
+                if SETTINGS["target_identifier"]:
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 255), 1)
+                    cv2.putText(frame, "LOCKED", (x, y+h+15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
 
-    # Render the Window
+                cv2.drawContours(frame, [approx], 0, (0, 255, 0), 2)
+                cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+    # --- [STEP 4: TELEMETRY & PERFORMANCE] ---
+    # Measures system FPS and processing latency
+    if SETTINGS["telemetry_overlay"]:
+        now = time.time()
+        fps = 1 / (now - prev_time) if (now - prev_time) > 0 else 0
+        prev_time = now
+        cv2.putText(frame, f"FPS: {int(fps)} | LATENCY: {int((1/fps)*1000) if fps>0 else 0}ms", 
+                    (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
     cv2.imshow(LANGUAGE_SETTINGS["ui_window_name"], frame)
+    if cv2.waitKey(1) & 0xFF == ord(CAM_CONFIG["exit_key"]): break
 
-    # Close application using the custom key defined in CAM_CONFIG
-    if cv2.waitKey(1) & 0xFF == ord(CAM_CONFIG["exit_key"]):
-        break
-
-# Clean exit process
 cap.release()
 cv2.destroyAllWindows()
