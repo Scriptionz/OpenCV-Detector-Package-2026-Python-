@@ -7,7 +7,7 @@
 # --------------- VERSION HISTORY ----------------- #
 
 # {LATEST} v1.3.3 - Shape Detection Plus & New Features & Optimizations - 20 January 2026
-# {LATEST} v1.3.2 - Final Modular Precision & Noise Filter - 8 January 2026
+# {OLD} v1.3.2 - Final Modular Precision & Noise Filter - 8 January 2026
 # {OLD} v1.3.1 - Fixed Shape Detection Logic - 8 January 2026
 # {OLD} v1.3.0 - Modular Output Full - 8 January 2026
 # {OLD} v1.2.0 - Shape Detection Update - 28 December 2025
