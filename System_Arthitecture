@@ -1,28 +1,35 @@
 # ----------------- SYSTEM ARCHITECTURE (HOW IT WORKS) ----------------- #
 # 1. DEPENDENCY MANAGEMENT:
-#    The script automatically checks for OpenCV and NumPy. If missing, it uses 
-#    subprocess to install them and restarts itself to ensure a clean environment.
+#    The system features a self-healing dependency check. It verifies OpenCV and 
+#    NumPy on startup; if missing, it auto-installs via subprocess and restarts 
+#    to maintain environment integrity.
 #
-# 2. CONFIGURATION LAYER:
-#    All system parameters (UI labels, feature toggles, camera settings) are 
-#    stored in modular dictionaries (LANGUAGE_SETTINGS, SETTINGS, CAM_CONFIG).
-#    This allows high-level customization without altering the core logic.
+# 2. MODULAR CONFIGURATION LAYER:
+#    Global parameters (UI labels, feature toggles, camera specs) are decoupled 
+#    into modular dictionaries. This architecture enables "tuning without touching"
+#    the core computer vision algorithms.
 #
-# 3. VISION PIPELINE:
-#    A. Image Acquisition: Captures real-time frames from the specified camera index.
-#    B. Pre-processing: Applies high-intensity Gaussian Blur on HSV space 
-#       to eliminate digital flickering and sensor noise.
-#    C. Color Masking: Uses inRange filtering to isolate specific color frequencies.
-#    D. Morphology (Closing): Fills small gaps within shapes and removes ghost pixels.
+# 3. VISION & PROCESSING PIPELINE:
+#    A. ACQUISITION: High-speed real-time frame capture from CAM_CONFIG index.
+#    B. PRE-PROCESSING: Converts to HSV color space and applies adaptive 
+#       Gaussian Blurring to eliminate digital flicker and sensor jitter.
+#    C. LIGHTING STABILIZATION: (New v1.3.3) Uses Histogram Equalization to 
+#       maintain detection accuracy under variable outdoor lighting conditions.
+#    D. MORPHOLOGICAL REFINEMENT: Executes OPEN/CLOSE operations to eliminate 
+#       pixel gaps and "ghosting" artifacts in low-quality streams.
 #
-# 4. OBJECT RECOGNITION:
-#    A. Contour Analysis: Extracts shape outlines and filters by modular area settings.
-#    B. Polygon Approximation: Uses Douglas-Peucker (approxPolyDP) for vertex count.
-#    C. Geometric Labeling: Classifies shapes based on corner counts (3, 4, 5, 6, 8+).
+# 4. SCIENTIFIC OBJECT RECOGNITION:
+#    A. CONTOUR ANALYSIS: Extracts structural outlines and filters by min_area.
+#    B. POLYGON APPROXIMATION: Implements Douglas-Peucker algorithm for vertex 
+#       mapping.
+#    C. CIRCULARITY ANALYSIS: (New v1.3.3) Uses mathematical roundness formula 
+#       (4*PI*Area / Perimeter^2) to verify circles regardless of pixel distortion.
+#    D. TARGET TRACKING: Dynamic Bounding Box logic (LOCKED) for visual identification.
 #
-# 5. USER INTERFACE:
-#    Real-time rendering of detection boxes, labels, and the center-point 
-#    color analyzer on the video stream.
+# 5. TELEMETRY & UI:
+#    Real-time HUD (Heads-Up Display) rendering for Shape/Color labels, 
+#    performance telemetry (FPS/Latency), and crosshair color analysis.
 #
-# > and a extra note, if you run application and can't close it, that means you didn't check settings. "q" key to stop it and you can change it.
+# > NOTE: To terminate the application, press the key defined in CAM_CONFIG 
+#   (Default: "q"). Closing the window manually may lead to resource leaks.
 # ----------------------------------------------------------------------- #
