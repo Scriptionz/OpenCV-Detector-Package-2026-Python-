@@ -3,3 +3,5 @@ Hi! Thanks for using ODP 26! This package contains camera detector with color de
 Detector.py contains all the script inside.
 
 Latest Update: v1.3.3 - 20 January 2026 - 23:17 (+3)
+
+Just download the py file for the system, others are txt or license so you dont need them.
