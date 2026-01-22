@@ -1,10 +1,9 @@
 ---
 name: Bug Report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+about: Report a detection error or system crash
+title: '[BUG] '
+labels: bug
+assignees: Scriptionz
 ---
 
 **Describe the bug**
