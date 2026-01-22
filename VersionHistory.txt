@@ -1,26 +1,28 @@
-[{LATEST} v1.3.3] - 2026-01-20
+> [{LATEST} v1.3.3] - 2026-01-20
 - Added: Mathematical Circularity formula (4*PI*Area/Perimeter^2) for 100% circle accuracy.
 - Added: Real-time Telemetry (FPS & Latency measurement).
 - Fixed: Frame timing logic and UI text overlaps.
 
-[{OLD} v1.3.2] - 2026-01-08
+> [{OLD} v1.3.2] - 2026-01-08
 - Improved: Enhanced Gaussian Blur and Morphological "Closing" to eliminate flicker.
 - Added: Target Identifier (LOCKED) bounding boxes for better visual tracking.
 - Added: Histogram Equalization for auto-brightness stabilization.
 
-[v1.3.1] - 2026-01-05
+> [v1.3.1] - 2026-01-05
 - Fixed: Logical errors in shape classification (vertex count vs noise).
 - Improved: Memory optimization for real-time processing.
 
-[v1.2.0] - 2025-12-28
+> [v1.2.0] - 2025-12-28
 - Added: Geometric Shape Detection (Triangle, Rectangle, Polygon).
 - Added: Modular DETECTION_PARAMS dictionary for easier tuning.
 
-[v1.1.0] - 2025-11-13
+> [v1.1.0] - 2025-11-13
 - Added: Modular UI (Status bars, crosshair indicators).
 - Improved: HSV color range sensitivity for outdoor environments.
 
-[{OLDEST} v1.0.0] - 2025-11-02
+> [{OLDEST} v1.0.0] - 2025-11-02
 - Initial Release: Core Color Detection engine.
 - Feature: Center-point pixel color analyzer.
 - Feature: Basic camera stream acquisition.
+
+Made by Emir Karadağ {2026}
