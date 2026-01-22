@@ -6,14 +6,6 @@
 
 # --------------- VERSION HISTORY ----------------- #
 
-# {LATEST} v1.3.3 - Shape Detection Plus & New Features & Optimizations - 20 January 2026
-# {OLD} v1.3.2 - Final Modular Precision & Noise Filter - 8 January 2026
-# {OLD} v1.3.1 - Fixed Shape Detection Logic - 8 January 2026
-# {OLD} v1.3.0 - Modular Output Full - 8 January 2026
-# {OLD} v1.2.0 - Shape Detection Update - 28 December 2025
-# {OLD} v1.1.0 - Modular Output Beta - 13 November 2025
-# {OLDEST} v1.0.0 - Color Detection - 2 November 2025
-
 import os
 import sys
 import subprocess
@@ -38,7 +30,6 @@ install_dependencies()
 
 import cv2
 import numpy as np
-
 
 # --------------- CONFIGURATION & LOCALIZATION ----------------- #
 
