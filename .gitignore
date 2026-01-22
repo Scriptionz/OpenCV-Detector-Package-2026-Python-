@@ -205,3 +205,31 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- UAV X Vision System Specific (v1.3.3) ---
+
+# Ignore Python dependencies folder if you use a virtual environment
+venv/
+.venv/
+env/
+
+# OpenCV Runtime & Temporary Display Cache
+# OpenCV bazen pencere ayarlarını veya geçici tamponları cache'e alabilir.
+.opencv_cache/
+
+# UAV Telemetry & Logging
+# Koduna ileride telemetry_log.csv gibi bir çıktı eklersen GitHub'a girmesin.
+*.csv
+*.log
+
+# Video Output & Screenshots
+# Test sırasında 'q' tuşuna basmadan önce aldığın kayıtlar veya ekran görüntüleri.
+captures/
+recordings/
+*.mp4
+*.avi
+*.jpg
+*.png
+
+# Byte-compiled files (Already in your standard list, but keeping for safety)
+__pycache__/
