@@ -4,8 +4,7 @@
 
 # !! Licensed under the MIT License. Please check the license before using the system. !!
 
-# --------------- VERSION HISTORY ----------------- #
-
+# --------------- LIBRARY IMPORTER (AUTO) ----------------- #
 import os
 import sys
 import subprocess
