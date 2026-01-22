@@ -214,16 +214,13 @@ venv/
 env/
 
 # OpenCV Runtime & Temporary Display Cache
-# OpenCV bazen pencere ayarlarını veya geçici tamponları cache'e alabilir.
 .opencv_cache/
 
 # UAV Telemetry & Logging
-# Koduna ileride telemetry_log.csv gibi bir çıktı eklersen GitHub'a girmesin.
 *.csv
 *.log
 
 # Video Output & Screenshots
-# Test sırasında 'q' tuşuna basmadan önce aldığın kayıtlar veya ekran görüntüleri.
 captures/
 recordings/
 *.mp4
