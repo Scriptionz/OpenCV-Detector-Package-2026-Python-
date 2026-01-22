@@ -7,14 +7,6 @@ assignees: ''
 
 ---
 
----
-name: Bug Report
-about: Report a detection error or system crash
-title: '[BUG] '
-labels: bug
-assignees: Scriptionz
----
-
 **Describe the bug**
 A clear and concise description of the issue (e.g., Circle detected as Square, FPS dropping below 5, or Camera failed to initialize).
 
